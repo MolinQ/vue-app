@@ -1,10 +1,18 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+import NavBar from "@/components/common/Navigation.vue";
+
+const route = useRoute();
+
+const showNavbar = computed(() => {
+  return route.path !== "/login";
+});
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <NewButton>New click</NewButton>
+  <NavBar v-if="showNavbar" />
+  <RouterView />
 </template>
 
-<style scoped>
-@import "tailwindcss";
-</style>
+<style scoped></style>
