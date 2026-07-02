@@ -52,9 +52,9 @@ const submit = handleSubmit(async (data) => {
       </div>
 
       <div class="mb-6 rounded-xl bg-gray-50 p-4">
-        <p class="text-sm text-gray-500">Email</p>
+        <p class="text-sm text-gray-500">Login</p>
         <p class="mt-1 font-medium text-gray-900">
-          {{ authStore.currentUser.email }}
+          {{ authStore.currentUser.login }}
         </p>
       </div>
 

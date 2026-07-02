@@ -1,16 +1,16 @@
 export type UserCredentials = {
-  email: string;
+  login: string;
   password: string;
 };
 
 export type RegisterData = {
-  email: string;
+  login: string;
   password: string;
   name: string;
 };
 
 export interface UserData {
-  email: string;
+  login: string;
   name: string;
 }
 

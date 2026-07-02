@@ -4,11 +4,12 @@ import { z } from "zod/v3";
 const registerSchema = toTypedSchema(
   z
     .object({
-      email: z
+      login: z
         .string()
         .trim()
-        .nonempty("Email is required")
-        .email("Invalid email"),
+        .nonempty("Login is required")
+        .min(3, "Login must be at least 3 characters")
+        .max(30, "Login must be at most 30 characters"),
 
       name: z
         .string()

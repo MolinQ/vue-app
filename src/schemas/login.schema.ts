@@ -3,11 +3,11 @@ import { z } from "zod/v3";
 
 const authSchema = toTypedSchema(
   z.object({
-    email: z
+    login: z
       .string()
       .trim()
-      .nonempty("Email is required")
-      .email("Invalid email"),
+      .nonempty("Login is required")
+      .min(3, "Login must be at least 3 characters"),
 
     password: z
       .string()

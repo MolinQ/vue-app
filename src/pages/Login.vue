@@ -15,7 +15,7 @@ const authError = ref("");
 const { handleSubmit } = useForm({
   validationSchema: authSchema,
   initialValues: {
-    email: "",
+    login: "",
     password: "",
   },
   validateOnMount: false,
@@ -47,10 +47,10 @@ const submit = handleSubmit(async (data: UserCredentials) => {
 
       <form @submit.prevent="submit" class="flex flex-col gap-5">
         <FormField
-          type="email"
-          name="email"
-          placeholder="Email"
-          autocomplete="email"
+          type="text"
+          name="login"
+          placeholder="Login"
+          autocomplete="username"
         />
 
         <FormField

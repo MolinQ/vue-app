@@ -15,7 +15,7 @@ const authError = ref("");
 const { handleSubmit } = useForm({
   validationSchema: registerSchema,
   initialValues: {
-    email: "",
+    login: "",
     name: "",
     password: "",
     confirmPassword: "",
@@ -23,21 +23,23 @@ const { handleSubmit } = useForm({
   validateOnMount: false,
 });
 
-const submit = handleSubmit(async (data: RegisterData & { confirmPassword: string }) => {
-  authError.value = "";
+const submit = handleSubmit(
+  async (data: RegisterData & { confirmPassword: string }) => {
+    authError.value = "";
 
-  try {
-    await authStore.register({
-      email: data.email,
-      name: data.name,
-      password: data.password,
-    });
-    router.push("/");
-  } catch (error) {
-    authError.value =
-      error instanceof AuthError ? error.message : "Registration failed";
-  }
-});
+    try {
+      await authStore.register({
+        login: data.login,
+        name: data.name,
+        password: data.password,
+      });
+      router.push("/");
+    } catch (error) {
+      authError.value =
+        error instanceof AuthError ? error.message : "Registration failed";
+    }
+  },
+);
 </script>
 
 <template>
@@ -52,10 +54,10 @@ const submit = handleSubmit(async (data: RegisterData & { confirmPassword: strin
 
       <form @submit.prevent="submit" class="flex flex-col gap-5">
         <FormField
-          type="email"
-          name="email"
-          placeholder="Email"
-          autocomplete="email"
+          type="text"
+          name="login"
+          placeholder="Login"
+          autocomplete="username"
         />
 
         <FormField
@@ -83,7 +85,9 @@ const submit = handleSubmit(async (data: RegisterData & { confirmPassword: strin
           {{ authError }}
         </p>
 
-        <FormButton type="submit" size="lg" class="mt-2">Create account</FormButton>
+        <FormButton type="submit" size="lg" class="mt-2">
+          Create account
+        </FormButton>
 
         <p class="text-center text-sm text-gray-500">
           Already have an account?

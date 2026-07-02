@@ -9,6 +9,12 @@ import type {
   UsersRegistry,
 } from "@/types/auth";
 
+const DEFAULT_ADMIN: StoredUser = {
+  login: "admin",
+  name: "Admin",
+  password: "admin123",
+};
+
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
@@ -24,6 +30,10 @@ export const useAuthStore = defineStore("auth", {
   }),
 
   actions: {
+    normalizeLogin(login: string) {
+      return login.trim().toLowerCase();
+    },
+
     async getUsersRegistry(): Promise<UsersRegistry> {
       return (await storage.get<UsersRegistry>(storageKeys.USERS)) ?? {};
     },
@@ -32,7 +42,19 @@ export const useAuthStore = defineStore("auth", {
       await storage.set(storageKeys.USERS, users);
     },
 
+    async ensureDefaultAdmin() {
+      const users = await this.getUsersRegistry();
+      const adminLogin = this.normalizeLogin(DEFAULT_ADMIN.login);
+
+      if (!users[adminLogin]) {
+        users[adminLogin] = DEFAULT_ADMIN;
+        await this.saveUsersRegistry(users);
+      }
+    },
+
     async init() {
+      await this.ensureDefaultAdmin();
+
       const sessionKey = await storage.get<string>(storageKeys.SESSION_KEY);
       const user = await storage.get<UserData>(storageKeys.USER_PROFILE);
 
@@ -45,31 +67,31 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async register(data: RegisterData) {
-      const email = data.email.trim().toLowerCase();
+      const login = this.normalizeLogin(data.login);
       const users = await this.getUsersRegistry();
 
-      if (users[email]) {
-        throw new AuthError("User with this email already exists");
+      if (users[login]) {
+        throw new AuthError("User with this login already exists");
       }
 
       const newUser: StoredUser = {
-        email,
+        login,
         name: data.name.trim(),
         password: data.password,
       };
 
-      users[email] = newUser;
+      users[login] = newUser;
       await this.saveUsersRegistry(users);
       await this.createSession(newUser);
     },
 
     async login(credentials: UserCredentials) {
-      const email = credentials.email.trim().toLowerCase();
+      const login = this.normalizeLogin(credentials.login);
       const users = await this.getUsersRegistry();
-      const user = users[email];
+      const user = users[login];
 
       if (!user) {
-        throw new AuthError("User with this email is not registered");
+        throw new AuthError("User with this login is not registered");
       }
 
       if (user.password !== credentials.password) {
@@ -82,7 +104,7 @@ export const useAuthStore = defineStore("auth", {
     async createSession(user: UserData) {
       const sessionKey = crypto.randomUUID();
       const profile: UserData = {
-        email: user.email,
+        login: user.login,
         name: user.name,
       };
 
@@ -106,10 +128,10 @@ export const useAuthStore = defineStore("auth", {
 
       const updatedUser: UserData = { ...this.currentUser, name };
       const users = await this.getUsersRegistry();
-      const storedUser = users[updatedUser.email];
+      const storedUser = users[updatedUser.login];
 
       if (storedUser) {
-        users[updatedUser.email] = { ...storedUser, name };
+        users[updatedUser.login] = { ...storedUser, name };
         await this.saveUsersRegistry(users);
       }
 
