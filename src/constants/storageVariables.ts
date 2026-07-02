@@ -6,4 +6,5 @@ export const storageKeys = {
 
 export const localStorageKeys = {
   FAVORITES: "favorites",
+  WATCHLIST: "watchlist",
 };

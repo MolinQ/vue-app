@@ -8,7 +8,7 @@ class FilmService extends HttpService {
 
   async searchFilms(
     searchText: string,
-    isAdult = true,
+    isAdult = false,
     page = 1,
   ): Promise<MovieResponse> {
     return this.get(

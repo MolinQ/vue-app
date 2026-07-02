@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Movie } from "@/types/films";
 import FavoriteButton from "@/components/films/FavoriteButton.vue";
+import WatchLaterButton from "@/components/films/WatchLaterButton.vue";
 
 defineProps<{
   film: Movie;
@@ -9,12 +10,16 @@ defineProps<{
 
 <template>
   <RouterLink :to="`/movie/${film.id}`" class="relative block">
+    <div class="absolute top-3 left-3 z-10">
+      <WatchLaterButton :film="film" />
+    </div>
+
     <div class="absolute top-3 right-3 z-10">
       <FavoriteButton :film="film" />
     </div>
 
     <div
-      class="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.02] transition duration-300 cursor-pointer"
+      class="h-full bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.02] transition duration-300 cursor-pointer"
     >
       <img
         :src="`https://image.tmdb.org/t/p/w500${film.poster_path}`"

@@ -29,7 +29,7 @@ function changePage(page: number) {
 <template>
   <div v-if="films" class="p-6">
     <div
-      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch"
     >
       <FilmCard v-for="film in films.results" :key="film.id" :film="film" />
     </div>

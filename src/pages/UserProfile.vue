@@ -63,6 +63,7 @@ const submit = handleSubmit(async (data) => {
           type="text"
           name="name"
           placeholder="Display name"
+          lable="Name"
           autocomplete="name"
         />
 

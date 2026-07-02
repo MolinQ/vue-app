@@ -5,6 +5,7 @@ import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Button from "@/components/common/MainButton.vue";
 import FavoriteButton from "@/components/films/FavoriteButton.vue";
+import WatchLaterButton from "@/components/films/WatchLaterButton.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,7 +33,7 @@ onMounted(() => {
     <Button size="sm" variant="primary" @click="goBack"> Back </Button>
 
     <div
-      class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden"
+      class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden mt-3.5"
     >
       <div class="grid md:grid-cols-3 gap-8 p-8">
         <div>
@@ -49,7 +50,10 @@ onMounted(() => {
               {{ movie.title }}
             </h1>
 
-            <FavoriteButton :film="movie" />
+            <div class="flex items-center gap-2">
+              <WatchLaterButton :film="movie" />
+              <FavoriteButton :film="movie" />
+            </div>
           </div>
 
           <div class="flex gap-3 items-center">
