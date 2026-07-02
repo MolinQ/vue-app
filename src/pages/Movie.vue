@@ -14,6 +14,7 @@ const movie = ref<MovieDetails | null>(null);
 
 const fetchFilm = async () => {
   movie.value = await filmService.getFilmById(Number(route.params.id));
+  console.log(movie.value);
 };
 
 const goBack = () => {

@@ -5,7 +5,14 @@ import "./assets/main.css";
 import "vue-awesome-paginate/dist/style.css";
 import { createPinia } from "pinia";
 import VueAwesomePaginate from "vue-awesome-paginate";
+import { useAuthStore } from "./stores/authStore";
 
 const pinia = createPinia();
+const app = createApp(App);
 
-createApp(App).use(router).use(pinia).use(VueAwesomePaginate).mount("#app");
+app.use(pinia);
+
+const authStore = useAuthStore();
+await authStore.init();
+
+app.use(router).use(VueAwesomePaginate).mount("#app");

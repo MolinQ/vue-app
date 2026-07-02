@@ -4,32 +4,38 @@ import { RouterLink } from "vue-router";
 import FormField from "../components/common/form/MainInput.vue";
 import FormButton from "../components/common/MainButton.vue";
 import { useForm } from "vee-validate";
-import authSchema from "@/schemas/login.schema.ts";
+import registerSchema from "@/schemas/register.schema";
 import { AuthError, useAuthStore } from "@/stores/authStore";
-import type { UserCredentials } from "@/types/auth.ts";
-import router from "@/router/router.ts";
+import type { RegisterData } from "@/types/auth";
+import router from "@/router/router";
 
 const authStore = useAuthStore();
 const authError = ref("");
 
 const { handleSubmit } = useForm({
-  validationSchema: authSchema,
+  validationSchema: registerSchema,
   initialValues: {
     email: "",
+    name: "",
     password: "",
+    confirmPassword: "",
   },
   validateOnMount: false,
 });
 
-const submit = handleSubmit(async (data: UserCredentials) => {
+const submit = handleSubmit(async (data: RegisterData & { confirmPassword: string }) => {
   authError.value = "";
 
   try {
-    await authStore.login(data);
+    await authStore.register({
+      email: data.email,
+      name: data.name,
+      password: data.password,
+    });
     router.push("/");
   } catch (error) {
     authError.value =
-      error instanceof AuthError ? error.message : "Login failed";
+      error instanceof AuthError ? error.message : "Registration failed";
   }
 });
 </script>
@@ -40,9 +46,8 @@ const submit = handleSubmit(async (data: UserCredentials) => {
       class="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl border border-gray-100"
     >
       <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gray-900">Login</h1>
-
-        <p class="mt-2 text-sm text-gray-500">Log in to your account</p>
+        <h1 class="text-3xl font-bold text-gray-900">Register</h1>
+        <p class="mt-2 text-sm text-gray-500">Create a new account</p>
       </div>
 
       <form @submit.prevent="submit" class="flex flex-col gap-5">
@@ -54,22 +59,36 @@ const submit = handleSubmit(async (data: UserCredentials) => {
         />
 
         <FormField
+          type="text"
+          name="name"
+          placeholder="Display name"
+          autocomplete="name"
+        />
+
+        <FormField
           type="password"
           name="password"
           placeholder="Password"
-          autocomplete="current-password"
+          autocomplete="new-password"
+        />
+
+        <FormField
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm password"
+          autocomplete="new-password"
         />
 
         <p v-if="authError" class="text-sm text-red-500">
           {{ authError }}
         </p>
 
-        <FormButton type="submit" size="lg" class="mt-2"> Log in </FormButton>
+        <FormButton type="submit" size="lg" class="mt-2">Create account</FormButton>
 
         <p class="text-center text-sm text-gray-500">
-          Don't have an account?
-          <RouterLink to="/register" class="text-blue-600 hover:underline">
-            Register
+          Already have an account?
+          <RouterLink to="/login" class="text-blue-600 hover:underline">
+            Log in
           </RouterLink>
         </p>
       </form>

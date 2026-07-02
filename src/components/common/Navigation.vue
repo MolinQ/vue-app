@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { localStorageVariables } from "@/constants/storageVariables";
 import router, { routes } from "@/router/router";
-import { LocalStorageService } from "@/services/StorageService";
+import { useAuthStore } from "@/stores/authStore";
 
-const storage = new LocalStorageService();
+const authStore = useAuthStore();
 const open = ref(false);
 
 const navRoutes = computed(() => routes.filter((route) => !route.hideFromNav));
 
-const logout = () => {
-  storage.remove(localStorageVariables.USER_DATA);
-  storage.remove(localStorageVariables.KEY);
+const logout = async () => {
+  await authStore.logout();
   router.push("/login");
 };
 </script>

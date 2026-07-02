@@ -1,18 +1,24 @@
-import { localStorageVariables } from "@/constants/storageVariables";
+import { useAuthStore } from "@/stores/authStore";
 import Login from "@/pages/Login.vue";
+import Register from "@/pages/Register.vue";
 import Profile from "@/pages/UserProfile.vue";
 import Home from "@/pages/Home.vue";
 import Search from "@/pages/SearchMovie.vue";
 import Movie from "@/pages/Movie.vue";
-import { LocalStorageService } from "@/services/StorageService";
 import { createRouter, createWebHistory } from "vue-router";
-const storage = new LocalStorageService();
+const guestRoutes = ["/login", "/register"];
 
 export const routes = [
   {
     path: "/login",
     name: "login",
     component: Login,
+    hideFromNav: true,
+  },
+  {
+    path: "/register",
+    name: "register",
+    component: Register,
     hideFromNav: true,
   },
   {
@@ -46,11 +52,21 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
-  const store = storage.get(localStorageVariables.KEY);
+router.beforeEach(async (to) => {
+  const authStore = useAuthStore();
 
-  if (!store && to.path !== "/login") {
+  if (!authStore.isInitialized) {
+    await authStore.init();
+  }
+
+  const isGuestRoute = guestRoutes.includes(to.path);
+
+  if (!authStore.isAuthenticated && !isGuestRoute) {
     return "/login";
+  }
+
+  if (authStore.isAuthenticated && isGuestRoute) {
+    return "/";
   }
 
   return true;
