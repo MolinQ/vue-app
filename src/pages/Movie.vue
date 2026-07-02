@@ -4,6 +4,7 @@ import type { MovieDetails } from "@/types/films";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Button from "@/components/common/MainButton.vue";
+import FavoriteButton from "@/components/films/FavoriteButton.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -43,9 +44,13 @@ onMounted(() => {
         </div>
 
         <div class="md:col-span-2 flex flex-col gap-5">
-          <h1 class="text-4xl font-bold">
-            {{ movie.title }}
-          </h1>
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <h1 class="text-4xl font-bold">
+              {{ movie.title }}
+            </h1>
+
+            <FavoriteButton :film="movie" />
+          </div>
 
           <div class="flex gap-3 items-center">
             <div class="bg-yellow-400 px-4 py-2 rounded-xl font-bold">

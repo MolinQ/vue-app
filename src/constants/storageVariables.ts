@@ -3,3 +3,7 @@ export const storageKeys = {
   USER_PROFILE: "user_profile",
   USERS: "users_registry",
 };
+
+export const localStorageKeys = {
+  FAVORITES: "favorites",
+};

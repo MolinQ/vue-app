@@ -4,6 +4,7 @@ import Register from "@/pages/Register.vue";
 import Profile from "@/pages/UserProfile.vue";
 import Home from "@/pages/Home.vue";
 import Search from "@/pages/SearchMovie.vue";
+import Favorites from "@/pages/Favorites.vue";
 import Movie from "@/pages/Movie.vue";
 import { createRouter, createWebHistory } from "vue-router";
 const guestRoutes = ["/login", "/register"];
@@ -37,6 +38,12 @@ export const routes = [
     path: "/search",
     name: "search",
     component: Search,
+    hideFromNav: false,
+  },
+  {
+    path: "/favorites",
+    name: "favorites",
+    component: Favorites,
     hideFromNav: false,
   },
   {

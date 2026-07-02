@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Movie } from "@/types/films";
+import FavoriteButton from "@/components/films/FavoriteButton.vue";
 
 defineProps<{
   film: Movie;
@@ -7,7 +8,11 @@ defineProps<{
 </script>
 
 <template>
-  <RouterLink :to="`/movie/${film.id}`">
+  <RouterLink :to="`/movie/${film.id}`" class="relative block">
+    <div class="absolute top-3 right-3 z-10">
+      <FavoriteButton :film="film" />
+    </div>
+
     <div
       class="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-[1.02] transition duration-300 cursor-pointer"
     >
@@ -32,7 +37,7 @@ defineProps<{
           </span>
 
           <div class="bg-yellow-400 px-2 py-1 rounded-lg text-sm font-semibold">
-            Rating {{ film.vote_average }} / 10
+            Rating {{ film.vote_average.toFixed(1) }} / 10
           </div>
         </div>
       </div>
