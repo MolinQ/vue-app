@@ -52,15 +52,64 @@ export const useAuthStore = defineStore("auth", {
       }
     },
 
+    isValidUserData(user: UserData | null | undefined): user is UserData {
+      return Boolean(user?.login && user?.name);
+    },
+
+    async resolveUserProfile(
+      profile: Partial<UserData>,
+    ): Promise<UserData | null> {
+      if (this.isValidUserData(profile as UserData)) {
+        return profile as UserData;
+      }
+
+      const users = await this.getUsersRegistry();
+      const registryUsers = Object.values(users);
+
+      if (profile.name) {
+        const matches = registryUsers.filter((user) => user.name === profile.name);
+        const matchedUser = matches[0];
+
+        if (matches.length === 1 && matchedUser) {
+          return { login: matchedUser.login, name: matchedUser.name };
+        }
+      }
+
+      if (registryUsers.length === 1) {
+        const user = registryUsers[0];
+
+        if (user) {
+          return { login: user.login, name: user.name };
+        }
+      }
+
+      return null;
+    },
+
     async init() {
       await this.ensureDefaultAdmin();
 
       const sessionKey = await storage.get<string>(storageKeys.SESSION_KEY);
-      const user = await storage.get<UserData>(storageKeys.USER_PROFILE);
+      const storedProfile = await storage.get<Partial<UserData>>(
+        storageKeys.USER_PROFILE,
+      );
 
-      if (sessionKey && user) {
-        this.currentUser = user;
-        this.isAuthenticated = true;
+      if (sessionKey && storedProfile) {
+        const user = await this.resolveUserProfile(storedProfile);
+
+        if (user) {
+          if (
+            storedProfile.login !== user.login ||
+            storedProfile.name !== user.name
+          ) {
+            await storage.set(storageKeys.USER_PROFILE, user);
+          }
+
+          this.currentUser = user;
+          this.isAuthenticated = true;
+        } else {
+          await this.logout();
+        }
       }
 
       this.isInitialized = true;
@@ -124,7 +173,7 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async updateDisplayName(name: string) {
-      if (!this.currentUser) return;
+      if (!this.isValidUserData(this.currentUser)) return;
 
       const updatedUser: UserData = { ...this.currentUser, name };
       const users = await this.getUsersRegistry();

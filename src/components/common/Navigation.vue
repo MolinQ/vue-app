@@ -22,7 +22,7 @@ const logout = async () => {
 </script>
 
 <template>
-  <nav class="bg-white shadow-sm border-b">
+  <nav class="sticky top-0 z-50 shrink-0 bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-4">
       <div class="h-16 flex items-center justify-between">
         <RouterLink to="/" class="font-bold text-xl text-blue-600">

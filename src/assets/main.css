@@ -1,8 +1,23 @@
 @import "tailwindcss";
 
+html {
+  scrollbar-gutter: stable;
+}
+
 #app {
-  height: calc(100vh - 64px);
+  min-height: 100vh;
   background-color: var(--color-gray-100);
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+  min-height: 0;
 }
 
 .pagination-container {

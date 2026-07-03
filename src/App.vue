@@ -11,8 +11,10 @@ const showNavbar = computed(() => {
 </script>
 
 <template>
-  <NavBar v-if="showNavbar" />
-  <RouterView />
+  <div class="app-layout">
+    <NavBar v-if="showNavbar" />
+    <main class="app-main">
+      <RouterView />
+    </main>
+  </div>
 </template>
-
-<style scoped></style>
