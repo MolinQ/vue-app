@@ -3,14 +3,20 @@ import FilmService from "@/services/FilmsService";
 import { ref, onMounted } from "vue";
 import type { MovieResponse } from "@/types/films";
 import FilmCard from "@/components/films/Card.vue";
+import Loader from "@/components/common/Loader.vue";
 
 const films = ref<MovieResponse | null>(null);
+const loading = ref(true);
 
 const filmService = new FilmService();
 
 const loadFilms = async (page = 1) => {
-  films.value = await filmService.getFilmList(page);
-  console.log(films.value);
+  try {
+    loading.value = true;
+    films.value = await filmService.getFilmList(page);
+  } finally {
+    loading.value = false;
+  }
 };
 
 onMounted(async () => {
@@ -27,7 +33,8 @@ function changePage(page: number) {
 </script>
 
 <template>
-  <div v-if="films" class="p-6">
+  <Loader v-if="loading" centered />
+  <div v-else-if="films" class="p-6">
     <div
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch"
     >

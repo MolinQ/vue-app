@@ -4,6 +4,7 @@ import type { MovieDetails } from "@/types/films";
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Button from "@/components/common/MainButton.vue";
+import Loader from "@/components/common/Loader.vue";
 import FavoriteButton from "@/components/films/FavoriteButton.vue";
 import WatchLaterButton from "@/components/films/WatchLaterButton.vue";
 
@@ -94,5 +95,5 @@ onMounted(() => {
     </div>
   </div>
 
-  <div v-else class="p-10 text-center">Loading...</div>
+  <Loader v-else centered />
 </template>

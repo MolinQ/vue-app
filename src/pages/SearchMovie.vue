@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Loader from "@/components/common/Loader.vue";
 import SearchInput from "@/components/common/form/SearchInput.vue";
 import FilmService from "@/services/FilmsService";
 import FilmCard from "@/components/films/Card.vue";
@@ -120,7 +121,7 @@ function changePage(page: number) {
           />
         </div>
       </div>
-      <div class="mt-5" v-if="loading">Loading...</div>
+      <Loader v-if="loading" class="mt-5" centered />
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5"
         v-else

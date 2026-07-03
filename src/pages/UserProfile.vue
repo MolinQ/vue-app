@@ -4,6 +4,7 @@ import { useForm } from "vee-validate";
 
 import FormField from "@/components/common/form/MainInput.vue";
 import Button from "@/components/common/MainButton.vue";
+import Loader from "@/components/common/Loader.vue";
 import profileSchema from "@/schemas/profile.schema";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -40,7 +41,14 @@ const submit = handleSubmit(async (data) => {
 
 <template>
   <div
-    v-if="isReady && authStore.currentUser"
+    v-if="!isReady || !authStore.currentUser"
+    class="flex justify-center items-center min-h-[calc(100vh-4rem)]"
+  >
+    <Loader size="lg" />
+  </div>
+
+  <div
+    v-else
     class="flex justify-center items-center min-h-[calc(100vh-4rem)] px-4 py-8"
   >
     <div
