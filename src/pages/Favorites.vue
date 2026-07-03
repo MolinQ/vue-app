@@ -2,7 +2,6 @@
 import { RouterLink } from "vue-router";
 
 import EmptyState from "@/components/common/EmptyState.vue";
-import Button from "@/components/common/MainButton.vue";
 import FilmCard from "@/components/films/Card.vue";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 

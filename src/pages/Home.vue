@@ -6,7 +6,7 @@ import FilmCard from "@/components/films/Card.vue";
 import FilmService from "@/services/FilmsService";
 import { getErrorMessage } from "@/types/http";
 import type { MovieResponse } from "@/types/films";
-import { onMounted, ref } from "vue";
+import { ref, watch } from "vue";
 
 const films = ref<MovieResponse | null>(null);
 const loading = ref(true);
@@ -29,24 +29,25 @@ const loadFilms = async (page = 1) => {
   }
 };
 
-onMounted(() => {
-  loadFilms();
-});
-
-function changePage(page: number) {
-  loadFilms(page);
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-}
+watch(
+  currentPage,
+  (page) => {
+    loadFilms(page);
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
   <Loader v-if="loading" centered />
 
   <div v-else-if="error" class="p-6">
-    <ErrorMessage :message="error" retry centered @retry="loadFilms(currentPage)" />
+    <ErrorMessage
+      :message="error"
+      retry
+      centered
+      @retry="loadFilms(currentPage)"
+    />
   </div>
 
   <div v-else-if="films && !films.results.length" class="p-6">
@@ -68,7 +69,6 @@ function changePage(page: number) {
         :items-per-page="30"
         :max-pages-shown="10"
         v-model="currentPage"
-        @click="changePage"
       />
     </div>
   </div>
