@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { RouterLink } from "vue-router";
+
+import EmptyState from "@/components/common/EmptyState.vue";
 import FilmCard from "@/components/films/Card.vue";
 import { useWatchlistStore } from "@/stores/watchlistStore";
 
@@ -9,7 +12,6 @@ const watchlistStore = useWatchlistStore();
   <section class="p-6">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900">Watch Later</h1>
-      <p class="mt-2 text-gray-500">Movies you plan to watch</p>
     </div>
 
     <div
@@ -23,11 +25,17 @@ const watchlistStore = useWatchlistStore();
       />
     </div>
 
-    <div v-else class="rounded-2xl p-12 text-center">
-      <p class="text-lg font-medium text-gray-900">No movies in watch later</p>
-      <p class="mt-2 text-gray-500">
-        Add movies from home, search, or movie details.
-      </p>
-    </div>
+    <EmptyState
+      v-else
+      title="No movies in watch later"
+      description="Add movies from home, search, or movie details"
+    >
+      <RouterLink
+        to="/search"
+        class="text-blue-600 hover:underline font-medium"
+      >
+        Search movies
+      </RouterLink>
+    </EmptyState>
   </section>
 </template>

@@ -12,7 +12,7 @@ class FilmService extends HttpService {
     page = 1,
   ): Promise<MovieResponse> {
     return this.get(
-      `/search/movie?query=${searchText}&include_adult=${isAdult}&language=en-US&page=${page}`,
+      `/search/movie?query=${encodeURIComponent(searchText)}&include_adult=${isAdult}&language=en-US&page=${page}`,
     );
   }
 

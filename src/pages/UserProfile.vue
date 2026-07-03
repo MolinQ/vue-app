@@ -2,15 +2,19 @@
 import { onMounted, ref } from "vue";
 import { useForm } from "vee-validate";
 
+import ErrorMessage from "@/components/common/ErrorMessage.vue";
 import FormField from "@/components/common/form/MainInput.vue";
 import Button from "@/components/common/MainButton.vue";
 import Loader from "@/components/common/Loader.vue";
 import profileSchema from "@/schemas/profile.schema";
 import { useAuthStore } from "@/stores/authStore";
+import { getErrorMessage } from "@/types/http";
 
 const authStore = useAuthStore();
 const isReady = ref(false);
 const isSaved = ref(false);
+const initError = ref("");
+const saveError = ref("");
 
 const { handleSubmit, resetForm } = useForm({
   validationSchema: profileSchema,
@@ -20,31 +24,57 @@ const { handleSubmit, resetForm } = useForm({
 });
 
 onMounted(async () => {
-  if (!authStore.isInitialized) {
-    await authStore.init();
+  try {
+    if (!authStore.isInitialized) {
+      await authStore.init();
+    }
+
+    if (!authStore.currentUser) {
+      initError.value = "Unable to load profile. Please log in again.";
+      return;
+    }
+
+    resetForm({
+      values: {
+        name: authStore.currentUser.name ?? "",
+      },
+    });
+  } catch (err) {
+    initError.value = getErrorMessage(err);
+  } finally {
+    isReady.value = true;
   }
-
-  resetForm({
-    values: {
-      name: authStore.currentUser?.name ?? "",
-    },
-  });
-
-  isReady.value = true;
 });
 
 const submit = handleSubmit(async (data) => {
-  await authStore.updateDisplayName(data.name);
-  isSaved.value = true;
+  saveError.value = "";
+  isSaved.value = false;
+
+  try {
+    await authStore.updateDisplayName(data.name);
+    isSaved.value = true;
+  } catch (err) {
+    saveError.value = getErrorMessage(err);
+  }
 });
 </script>
 
 <template>
   <div
-    v-if="!isReady || !authStore.currentUser"
+    v-if="!isReady"
     class="flex justify-center items-center min-h-[calc(100vh-4rem)]"
   >
     <Loader size="lg" />
+  </div>
+
+  <div
+    v-else-if="initError || !authStore.currentUser"
+    class="flex justify-center items-center min-h-[calc(100vh-4rem)] px-4"
+  >
+    <ErrorMessage
+      :message="initError || 'Unable to load profile. Please log in again.'"
+      centered
+    />
   </div>
 
   <div
@@ -78,6 +108,8 @@ const submit = handleSubmit(async (data) => {
         <p v-if="isSaved" class="text-sm text-green-600">
           Profile saved successfully.
         </p>
+
+        <ErrorMessage v-if="saveError" :message="saveError" />
 
         <Button type="submit" size="lg" class="mt-2">Save changes</Button>
       </form>

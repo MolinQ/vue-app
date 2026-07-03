@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import FilmService from "@/services/FilmsService";
-import type { MovieDetails } from "@/types/films";
-import { onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
 import Button from "@/components/common/MainButton.vue";
+import ErrorMessage from "@/components/common/ErrorMessage.vue";
 import Loader from "@/components/common/Loader.vue";
 import FavoriteButton from "@/components/films/FavoriteButton.vue";
 import WatchLaterButton from "@/components/films/WatchLaterButton.vue";
+import FilmService from "@/services/FilmsService";
+import { getErrorMessage } from "@/types/http";
+import type { MovieDetails } from "@/types/films";
+import { onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -14,10 +16,28 @@ const router = useRouter();
 const filmService = new FilmService();
 
 const movie = ref<MovieDetails | null>(null);
+const loading = ref(true);
+const error = ref("");
 
 const fetchFilm = async () => {
-  movie.value = await filmService.getFilmById(Number(route.params.id));
-  console.log(movie.value);
+  const id = Number(route.params.id);
+
+  if (!Number.isFinite(id)) {
+    error.value = "Invalid movie ID.";
+    loading.value = false;
+    return;
+  }
+
+  try {
+    loading.value = true;
+    error.value = "";
+    movie.value = await filmService.getFilmById(id);
+  } catch (err) {
+    error.value = getErrorMessage(err);
+    movie.value = null;
+  } finally {
+    loading.value = false;
+  }
 };
 
 const goBack = () => {
@@ -30,7 +50,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="movie" class="min-h-screen bg-gray-100 p-8">
+  <div v-if="loading" class="p-8">
+    <Loader centered />
+  </div>
+
+  <div v-else-if="error" class="p-8">
+    <Button size="sm" variant="primary" @click="goBack">Back</Button>
+
+    <div class="mt-6">
+      <ErrorMessage :message="error" retry centered @retry="fetchFilm" />
+    </div>
+  </div>
+
+  <div v-else-if="movie" class="min-h-screen bg-gray-100 p-8">
     <Button size="sm" variant="primary" @click="goBack"> Back </Button>
 
     <div
@@ -94,6 +126,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-
-  <Loader v-else centered />
 </template>

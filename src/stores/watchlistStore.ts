@@ -47,7 +47,12 @@ export const useWatchlistStore = defineStore("watchlist", {
       const data = storage.get(localStorageKeys.WATCHLIST);
 
       if (data) {
-        this.watchlist = JSON.parse(data) as Movie[];
+        try {
+          this.watchlist = JSON.parse(data) as Movie[];
+        } catch {
+          this.watchlist = [];
+          storage.remove(localStorageKeys.WATCHLIST);
+        }
       }
 
       this.isInitialized = true;

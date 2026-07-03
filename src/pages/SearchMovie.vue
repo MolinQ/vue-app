@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import EmptyState from "@/components/common/EmptyState.vue";
+import ErrorMessage from "@/components/common/ErrorMessage.vue";
 import Loader from "@/components/common/Loader.vue";
 import SearchInput from "@/components/common/form/SearchInput.vue";
-import FilmService from "@/services/FilmsService";
 import FilmCard from "@/components/films/Card.vue";
-import { ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import FilmService from "@/services/FilmsService";
+import { getErrorMessage } from "@/types/http";
 import type { MovieResponse } from "@/types/films";
+import { computed, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const filmService = new FilmService();
 const route = useRoute();
@@ -14,10 +17,25 @@ const router = useRouter();
 const search = ref("");
 const films = ref<MovieResponse | null>(null);
 const loading = ref(false);
+const error = ref("");
 const currentPage = ref(1);
 
 let timeout: number | undefined;
 let skipSearchWatch = false;
+
+const hasSearchQuery = computed(() => search.value.trim().length > 0);
+
+const emptyResultsTitle = computed(() =>
+  hasSearchQuery.value
+    ? `No movies found for "${search.value.trim()}"`
+    : "Enter a movie title to search",
+);
+
+const emptyResultsDescription = computed(() =>
+  hasSearchQuery.value
+    ? "Try a different search term or check the spelling."
+    : "Start typing in the search field above.",
+);
 
 function getQueryFromRoute() {
   return {
@@ -45,15 +63,18 @@ async function fetchFilms(q: string, page: number) {
   if (!q.trim()) {
     films.value = null;
     currentPage.value = 1;
+    error.value = "";
     return;
   }
 
   try {
     loading.value = true;
+    error.value = "";
     films.value = await filmService.searchFilms(q, false, page);
     currentPage.value = page;
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    error.value = getErrorMessage(err);
+    films.value = null;
   } finally {
     loading.value = false;
   }
@@ -74,6 +95,11 @@ function updateRoute(q: string, page: number) {
     path: "/search",
     query: buildQuery(q, page),
   });
+}
+
+function retrySearch() {
+  const { q, page } = getQueryFromRoute();
+  fetchFilms(q, page);
 }
 
 watch(
@@ -121,16 +147,35 @@ function changePage(page: number) {
           />
         </div>
       </div>
+
       <Loader v-if="loading" class="mt-5" centered />
+
+      <ErrorMessage
+        v-else-if="error"
+        class="mt-5 w-full max-w-2xl"
+        :message="error"
+        retry
+        centered
+        @retry="retrySearch"
+      />
+
+      <EmptyState
+        v-else-if="!hasSearchQuery || (films && !films.results.length)"
+        class="mt-5 w-full max-w-2xl"
+        :title="emptyResultsTitle"
+        :description="emptyResultsDescription"
+      />
+
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5"
-        v-else
+        v-else-if="films"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5 w-full"
       >
-        <FilmCard v-for="film in films?.results" :key="film.id" :film="film" />
+        <FilmCard v-for="film in films.results" :key="film.id" :film="film" />
       </div>
+
       <div class="mt-8 flex justify-center pb-5">
         <vue-awesome-paginate
-          v-if="films"
+          v-if="films && films.results.length"
           :total-items="
             films.total_results < 15000 ? films.total_results : 15000
           "

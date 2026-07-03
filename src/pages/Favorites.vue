@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { RouterLink } from "vue-router";
+
+import EmptyState from "@/components/common/EmptyState.vue";
+import Button from "@/components/common/MainButton.vue";
 import FilmCard from "@/components/films/Card.vue";
 import { useFavoritesStore } from "@/stores/favoritesStore";
 
@@ -22,8 +26,14 @@ const favoritesStore = useFavoritesStore();
       />
     </div>
 
-    <div v-else class="rounded-2xl p-12 text-center">
-      <p class="text-lg font-medium text-gray-900">No favorite movies</p>
-    </div>
+    <EmptyState
+      v-else
+      title="No favorite movies"
+      description="Browse movies and add to your favorites"
+    >
+      <RouterLink to="/" class="text-blue-600 hover:underline font-medium">
+        Browse movies
+      </RouterLink>
+    </EmptyState>
   </section>
 </template>

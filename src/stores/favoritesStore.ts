@@ -47,7 +47,12 @@ export const useFavoritesStore = defineStore("favorites", {
       const data = storage.get(localStorageKeys.FAVORITES);
 
       if (data) {
-        this.favorites = JSON.parse(data) as Movie[];
+        try {
+          this.favorites = JSON.parse(data) as Movie[];
+        } catch {
+          this.favorites = [];
+          storage.remove(localStorageKeys.FAVORITES);
+        }
       }
 
       this.isInitialized = true;
