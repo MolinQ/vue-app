@@ -7,7 +7,13 @@ import { useAuthStore } from "@/stores/authStore";
 const authStore = useAuthStore();
 const open = ref(false);
 
-const navRoutes = computed(() => routes.filter((route) => !route.hideFromNav));
+const navRoutes = computed(() =>
+  routes.filter((route) => {
+    if (route.hideFromNav) return false;
+    if (route.meta?.requiresAuth && !authStore.isAuthenticated) return false;
+    return true;
+  }),
+);
 
 const logout = async () => {
   await authStore.logout();
@@ -33,7 +39,16 @@ const logout = async () => {
             {{ route.name }}
           </RouterLink>
 
+          <RouterLink
+            v-if="!authStore.isAuthenticated"
+            to="/login"
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Login
+          </RouterLink>
+
           <button
+            v-else
             @click="logout"
             class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
           >
@@ -54,7 +69,16 @@ const logout = async () => {
           {{ route.name }}
         </RouterLink>
 
+        <RouterLink
+          v-if="!authStore.isAuthenticated"
+          to="/login"
+          class="w-full py-2 rounded-lg bg-blue-600 text-white text-center"
+        >
+          Login
+        </RouterLink>
+
         <button
+          v-else
           class="w-full py-2 rounded-lg bg-red-500 text-white"
           @click="logout"
         >

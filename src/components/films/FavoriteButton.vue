@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useFavoritesStore } from "@/stores/favoritesStore";
+import { useAuthStore } from "@/stores/authStore";
 import type { Movie, MovieDetails } from "@/types/films";
 import { computed } from "vue";
 
@@ -7,6 +8,7 @@ const props = defineProps<{
   film: Movie | MovieDetails;
 }>();
 
+const authStore = useAuthStore();
 const favoritesStore = useFavoritesStore();
 
 const isFavorite = computed(() => favoritesStore.isFavorite(props.film.id));
@@ -20,6 +22,7 @@ const toggleFavorite = (event: Event) => {
 
 <template>
   <button
+    v-if="authStore.isAuthenticated"
     type="button"
     :aria-label="isFavorite ? 'Remove from favorites' : 'Add to favorites'"
     class="rounded-full bg-white/90 p-2 shadow-md transition hover:scale-110"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useWatchlistStore } from "@/stores/watchlistStore";
+import { useAuthStore } from "@/stores/authStore";
 import type { Movie, MovieDetails } from "@/types/films";
 import { computed } from "vue";
 
@@ -7,6 +8,7 @@ const props = defineProps<{
   film: Movie | MovieDetails;
 }>();
 
+const authStore = useAuthStore();
 const watchlistStore = useWatchlistStore();
 
 const isInWatchlist = computed(() =>
@@ -22,6 +24,7 @@ const toggleWatchlist = (event: Event) => {
 
 <template>
   <button
+    v-if="authStore.isAuthenticated"
     type="button"
     :aria-label="
       isInWatchlist ? 'Remove from watch later' : 'Add to watch later'
